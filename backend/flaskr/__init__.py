@@ -114,7 +114,7 @@ def create_app(test_config=None):
   This removal will persist in the database and when you refresh the page. 
   '''
   @app.route('/questions/<int:question_id>', methods=['DELETE'])
-  def delete_question(question_id):
+  def remove_question(question_id):
     try:
       question = Question.query.filter(Question.id == question_id).one_or_none()
 
@@ -144,7 +144,7 @@ def create_app(test_config=None):
   of the questions list in the "List" tab.  
   '''
   @app.route('/questions', methods=['POST'])
-  def create_question():
+  def add_question():
     body = request.get_json()
 
     new_question = body.get('question', None)
