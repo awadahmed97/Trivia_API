@@ -213,25 +213,35 @@ def create_app(test_config=None):
   @app.route('/quiz', methods=['POST'])
   def quiz_game():
     req = request.get_json()  #request
-    previous_question = req.get('previous_question', '')  #gets the previous question
-    category = req.get('quiz_category', '') #quiz
+    previous = req['previous_questions'] #previous question parameter
+    quizcategory = req['quiz_category'] #category parameter
 
-    if previous_question is None:
-      abort(400)
-    if category is None:
-      abort(400) 
+    #if category is clicked get all questions from specific category
+    if quizcategory['type'] == "click":
+      questions = Question.query.all()
+    else:
+      questions = Question.query.filter_by(category = quizcategory['id']).all()
 
-    questions = Question.query.filter(Question.category == category['id']).all()
+    paginate_questions = [items.format() for items in questions]
+
+    questions = []
+    #if question is not in previous then we can append to questions 
+    for item in paginate_questions:
+      if item['id'] not in previous:
+        questions.append(item)
+    #selecting questions randomly
+    if len(questions) > 0:
+      questions_selected = random.choice(questions)
 
     return jsonify({
-      'question': random.choice(questions).format(),
-      }) 
-
+      'success': True,
+      'quiz': questions_selected
+      })
   #@TODO: 
   #Create error handlers for all expected errors 
   #including 404 and 422. 
   @app.errorhandler(400)
-  def not_found(error):
+  def bad_request(error):
     return jsonify({"success":False,
       "error":400,
       "message":" Bad Request"}), 400
@@ -243,13 +253,13 @@ def create_app(test_config=None):
       "message":"resource not found"}), 404
 
   @app.errorhandler(422)
-  def not_found(error):
+  def unprocessable_entity(error):
     return jsonify({"success":False,
       "error":422,
-      "message":" Unprocessable Entity"}), 422
+      "message":"Unprocessable Entity"}), 422
 
   @app.errorhandler(405)
-  def not_found(error):
+  def method_not_allowed(error):
     return jsonify({
       "success": False,
       "error": 405,
