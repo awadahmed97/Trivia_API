@@ -217,6 +217,7 @@ def create_app(test_config=None):
     quizcategory = req['quiz_category'] #category parameter
 
     #if category is clicked get all questions from specific category
+    #else get specific
     if quizcategory['type'] == "click":
       questions = Question.query.all()
     else:
