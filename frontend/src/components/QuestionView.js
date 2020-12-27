@@ -59,8 +59,9 @@ class QuestionView extends Component {
   }
 
   getByCategory= (id) => {
+    const ID = (Number(id)+1)
     $.ajax({
-      url: `http://127.0.0.1:5000/categories/${id}/questions`, //TODO: update request URL
+      url: `http://127.0.0.1:5000/categories/${ID}/questions`, //TODO: update request URL
       type: "GET",
       success: (result) => {
         this.setState({
@@ -78,11 +79,11 @@ class QuestionView extends Component {
 
   submitSearch = (searchTerm) => {
     $.ajax({
-      url: `http://127.0.0.1:5000/questions`, //TODO: update request URL
+      url: `http://127.0.0.1:5000/questions/search`,//TODO: update request URL
       type: "POST",
       dataType: 'json',
       contentType: 'application/json',
-      data: JSON.stringify({searchTerm: searchTerm}),
+      data: JSON.stringify({search_term: searchTerm}),
       xhrFields: {
         withCredentials: true
       },
@@ -126,8 +127,9 @@ class QuestionView extends Component {
           <h2 onClick={() => {this.getQuestions()}}>Categories</h2>
           <ul>
             {Object.keys(this.state.categories).map((id, ) => (
+              
               <li key={id} onClick={() => {this.getByCategory(id)}}>
-                {this.state.categories[id]}
+                {this.state.categories[id].type}
                 <img className="category" src={`${this.state.categories[id]}.svg`}/>
               </li>
             ))}
