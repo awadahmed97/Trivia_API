@@ -174,9 +174,9 @@ def create_app(test_config=None):
   @app.route('/questions/search', methods=['POST'])
   def search_term():
     req = request.get_json()
-    search_term = req['search_term']
+    searchTerm = req['search_term']
     try:
-      answer = Question.query.filter(Question.question.ilike(f'%{search_term}%')).all()
+      answer = Question.query.filter(Question.question.ilike(f'%{searchTerm}%')).all()
       mydata = paginate_questions(request, answer)
     
       if len(mydata) == 0:
