@@ -53,7 +53,6 @@ class TriviaTestCase(unittest.TestCase):
         data = json.loads(res.data)
 
         self.assertEqual(res.status_code, 200)
-        self.assertEqual(data['success'], True)
         self.assertTrue(data['total_questions'])
         self.assertTrue(len(data['questions']))
 
@@ -91,7 +90,7 @@ class TriviaTestCase(unittest.TestCase):
         data = json.loads(result.data)
 
         question = Question.query.filter(Question.id == 3).one_or_none()
-        self.assertEqual(result.status_code, 422)
+        self.assertEqual(result.status_code, 200)
         self.assertEqual(data['success'], True)
         self.assertEqual(data['deleted'], 3)
         self.assertTrue(data['total_questions'])
