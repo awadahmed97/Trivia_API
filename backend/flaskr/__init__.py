@@ -47,18 +47,23 @@ def create_app(test_config=None):
   #for all available categories.
   @app.route('/categories')
   def get_categories():
-    selection = Category.query.order_by(Category.id).all()
+    try:
+      selection = Category.query.order_by(Category.id).all()
 
-    formatted_categories = paginate_categories(request, selection)
+      formatted_categories = paginate_categories(request, selection)
 
-    if len(formatted_categories) == 0:
-      abort(404)
+      if len(formatted_categories) == 0:
+        abort(404)
 
-    return jsonify({
+      return jsonify({
       'success':True,
       'categories': formatted_categories,
       'total_categories': len(formatted_categories)
       })
+
+
+    except:
+      abort(422)
 
   #@TODO: 
   #Create an endpoint to handle GET requests for questions, 
@@ -151,7 +156,7 @@ def create_app(test_config=None):
         'total_questions': len(Question.query.all()) 
         })
     except:
-      abort(422)
+      abort(405)
 
   #@TODO: 
   #Create a POST endpoint to get questions based on a search term. 
@@ -164,26 +169,27 @@ def create_app(test_config=None):
   @app.route('/questions/search', methods=['POST'])
   def search_term():
     req = request.get_json()
-    search_term = req.get('search_term', '')
-    answer = Question.query.filter(Question.question.ilike(f'%{search_term}%')).all()
-    mydata = paginate_questions(request, answer)
-  
-    if len(mydata) == 0:
-      abort(404)
+    search_term = req['search_term']
+    try:
+      answer = Question.query.filter(Question.question.ilike(f'%{search_term}%')).all()
+      mydata = paginate_questions(request, answer)
     
-    return jsonify({
-      'questions': mydata,
-      'total_questions': len(answer),
-      'current_category': 1,
-    })
+      if len(mydata) == 0:
+        abort(404)
+      
+      return jsonify({
+        'questions': mydata,
+        'total_questions': len(answer),
+        'passed': True
+      })
+    except:
+      abort(400)
 
   #@TODO: 
   #Create a GET endpoint to get questions based on category. 
-
   #TEST: In the "List" tab / main screen, clicking on one of the 
   #categories in the left column will cause only questions of that 
   #category to be shown. 
-
   @app.route('/categories/<int:categories_id>')
   def get_questions_by_category(categories_id):
     answer = Question.query.filter(Question.category == categories_id).all()
@@ -210,34 +216,36 @@ def create_app(test_config=None):
   #one question at a time is displayed, the user is allowed to answer
   #and shown whether they were correct or not. 
 
-  @app.route('/quiz', methods=['POST'])
+  @app.route('/quizzes', methods=['POST'])
   def quiz_game():
     req = request.get_json()  #request
     previous = req['previous_questions'] #previous question parameter
     quizcategory = req['quiz_category'] #category parameter
 
-    #if category is clicked get all questions from specific category
-    #else get specific
-    if quizcategory['type'] == "click":
-      questions = Question.query.all()
-    else:
-      questions = Question.query.filter_by(category = quizcategory['id']).all()
+    category = Category.query.get(quizcategory)
+    if category is None:
+      abort(404)
 
-    paginate_questions = [items.format() for items in questions]
+    try:
+      questions = Question.query.filter(Question.category == quizcategory).all()
+      if len(questions) == len(previous):
+        return({
+          'success': True,
+          'questions_left': None
+          })
+      else:
+        ran_q = []
+        for question in questions:
+          if question.id not in previous:
+            ran_q.append(question.format())
 
-    questions = []
-    #if question is not in previous then we can append to questions 
-    for item in paginate_questions:
-      if item['id'] not in previous:
-        questions.append(item)
-    #selecting questions randomly
-    if len(questions) > 0:
-      questions_selected = random.choice(questions)
-
-    return jsonify({
-      'success': True,
-      'quiz': questions_selected
-      })
+        select = ran_q[random.randint(0,len(ran_q))]
+        return jsonify({
+          'success': True,
+          'quiz': select
+          })
+    except:
+      abort(422)
   #@TODO: 
   #Create error handlers for all expected errors 
   #including 404 and 422. 
@@ -245,7 +253,7 @@ def create_app(test_config=None):
   def bad_request(error):
     return jsonify({"success":False,
       "error":400,
-      "message":" Bad Request"}), 400
+      "message":"Bad Request"}), 400
 
   @app.errorhandler(404)
   def not_found(error):
