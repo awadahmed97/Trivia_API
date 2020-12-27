@@ -87,13 +87,13 @@ class TriviaTestCase(unittest.TestCase):
 
     #Delete expected
     def test_delete_question(self):
-        result = self.client().delete('/questions/24')
+        result = self.client().delete('/questions/3')
         data = json.loads(result.data)
 
-        question = Question.query.filter(Question.id == 24).one_or_none()
+        question = Question.query.filter(Question.id == 3).one_or_none()
         self.assertEqual(result.status_code, 422)
         self.assertEqual(data['success'], True)
-        self.assertEqual(data['deleted'], 24)
+        self.assertEqual(data['deleted'], 3)
         self.assertTrue(data['total_questions'])
         self.assertTrue(len(data['questions']))
         self.assertEqual(question, None)
@@ -165,7 +165,7 @@ class TriviaTestCase(unittest.TestCase):
 
     #post quiz expected
     def test_quiz_for_expected(self):
-        result = self.client().post('/quizzes', json={"quiz_category": 1,"previous_questions": [14]})
+        result = self.client().post('/quizzes', json={"quiz_category": 2,"previous_questions": [14]})
         data  = result.get_json()
 
         self.assertEqual(data['success'], True)
