@@ -58,7 +58,6 @@ def create_app(test_config=None):
       return jsonify({
       'success':True,
       'categories': formatted_categories,
-      'total_categories': len(formatted_categories)
       })
 
 
@@ -77,15 +76,21 @@ def create_app(test_config=None):
   @app.route('/questions')
   def get_questions():
     selection = Question.query.order_by(Question.id).all()
-    current_questions = paginate_questions(request, selection)
+    questions = paginate_questions(request, selection)
+    current_category = Category.query.get(1).format()
+    selection = Category.query.all()
+    categories = paginate_categories(request, selection)
 
-    if len(current_questions) == 0:
+    total_questions=len(Question.query.all())
+
+    if len(questions) == 0:
       abort(404)
 
     return jsonify({
-      'success': True,
-      'questions': current_questions,
-      'total_questions': len(Question.query.all()) 
+      'questions': questions,
+      'total_questions': total_questions,
+      'categories':categories,
+      'current_category':current_category,
       })
 
   @app.route('/questions/<int:question_id>')
@@ -179,8 +184,7 @@ def create_app(test_config=None):
       
       return jsonify({
         'questions': mydata,
-        'total_questions': len(answer),
-        'passed': True
+        'total_questions': len(answer)
       })
     except:
       abort(400)
@@ -190,7 +194,7 @@ def create_app(test_config=None):
   #TEST: In the "List" tab / main screen, clicking on one of the 
   #categories in the left column will cause only questions of that 
   #category to be shown. 
-  @app.route('/categories/<int:categories_id>')
+  @app.route('/categories/<int:categories_id>/questions')
   def get_questions_by_category(categories_id):
     answer = Question.query.filter(Question.category == categories_id).all()
     mydata = paginate_questions(request, answer)
