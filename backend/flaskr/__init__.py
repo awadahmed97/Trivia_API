@@ -23,7 +23,7 @@ def paginate_categories(request, selection):
   start = (page -1) * CATEGORIES_PER_PAGE
   end = start + CATEGORIES_PER_PAGE
 
-  categories = [category.format1() for category in selection]
+  categories = [category.format() for category in selection]
   current_categories = categories[start:end]
 
   return current_categories
