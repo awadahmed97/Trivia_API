@@ -72,10 +72,16 @@ This README is missing documentation of your endpoints. Below is an example for 
 
 Endpoints
 GET '/categories'
-GET ...
-POST ...
-DELETE ...
+GET '/questions'
+POST '/questions'
+DELETE '/questions/<int:question_id>'
 
+also added 
+GET '/questions/<int:question_id>'
+POST '/questions/search'
+GET '/categories/<int:categories_id>'
+
+##########################################################################
 GET '/categories'
 - Fetches a dictionary of categories in which the keys are the ids and the value is the corresponding string of the category
 - Request Arguments: None
@@ -86,6 +92,107 @@ GET '/categories'
 '4' : "History",
 '5' : "Entertainment",
 '6' : "Sports"}
+##########################################################################
+GET '/questions'
+- Fetches a dictionary of all the questions and they are ordered by question id
+- Request Arguments: None
+- Returns: An object with a multiple keys, questions, answer, category, difficulty, id, question.
+{
+  "questions": [
+    {
+      "answer": "Apollo 13", 
+      "category": 5, 
+      "difficulty": 4, 
+      "id": 2, 
+      "question": "What movie earned Tom Hanks his third straight Oscar nomination, in 1996?"
+    },
+    ....
+    ]
+}
+##########################################################################
+POST '/questions'
+-Posts a question to the database.
+-Request arguments: None
+-Returns: id created as well as a list of all questions.
+{
+  "created": 24, 
+  "questions": [{
+      "answer": "Apollo 13", 
+      "category": 5, 
+      "difficulty": 4, 
+      "id": 2, 
+      "question": "What movie earned Tom Hanks his third straight Oscar nomination, in 1996?"
+    },]
+##########################################################################
+DELETE '/questions/<int:question_id>'
+-Delets a question from the database, using the questions id number.
+-Request arguments: user needs to pass in an id number
+-Returns: All questions without the question that was removed and id number of the removed question
+{
+  "deleted": 24, 
+  "questions": [
+    {
+      "answer": "Apollo 13", 
+      "category": 5, 
+      "difficulty": 4, 
+      "id": 2, 
+      "question": "What movie earned Tom Hanks his third straight Oscar nomination, in 1996?"
+    }, 
+##########################################################################
+GET '/questions/<int:question_id>'
+-fetches a question with the id number of the question
+-Request arguments:user needs to pass an id number
+-Returns:the specific question 
+{
+  "questions": {
+    "answer": "Apollo 13", 
+    "category": 5, 
+    "difficulty": 4, 
+    "id": 2, 
+    "question": "What movie earned Tom Hanks his third straight Oscar nomination, in 1996?"
+  }, 
+  "success": true
+}
+##########################################################################
+POST '/questions/search'
+-post a search term and returns matching questions with the term
+-Request arguments:user needs to pass a search term
+-Returns:a list of all the matched questions
+{
+  "questions": {
+    "answer": "Apollo 13", 
+    "category": 5, 
+    "difficulty": 4, 
+    "id": 2, 
+    "question": "What movie earned Tom Hanks his third straight Oscar nomination, in 1996?"
+  }
+  ...
+  , 
+  "success": true
+}
+##########################################################################
+GET '/categories/<int:categories_id>'
+-fetches a question with the id number of the question
+-Request arguments:user needs to pass a category id number
+-Returns:questions from a specific category
+{
+  "current_category": 2, 
+  "questions": [
+    {
+      "answer": "Escher", 
+      "category": 2, 
+      "difficulty": 1, 
+      "id": 16, 
+      "question": "Which Dutch graphic artist\u2013initials M C was a creator of optical illusions?"
+    },
+    ...
+}
+
+##########################################################################
+POST '/quiz'
+-POSTS a game that gives user the questions based on categories.
+-Request arguments: None
+-Returns:quiz game that gives you questions based on category you entered
 
 ```
 
